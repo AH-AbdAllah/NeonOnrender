@@ -89,6 +89,19 @@ function showToast(message, type = 'success') {
   }, 4000);
 }
 
+function setButtonLoading(form, isLoading, text) {
+  const btn = form.querySelector('button[type="submit"]');
+  if (!btn) return;
+  if (isLoading) {
+    btn.dataset.originalHtml = btn.innerHTML;
+    btn.disabled = true;
+    btn.innerHTML = `<i class="fa-solid fa-spinner fa-spin"></i> <span>${text}</span>`;
+  } else {
+    btn.disabled = false;
+    btn.innerHTML = btn.dataset.originalHtml || btn.innerHTML;
+  }
+}
+
 // Global API Fetch Interceptor
 async function apiCall(endpoint, options = {}) {
   const url = `${API_BASE}${endpoint}`;
@@ -105,7 +118,16 @@ async function apiCall(endpoint, options = {}) {
       ...(options.body && { body: JSON.stringify(options.body) })
     });
 
-    const data = await response.json();
+    let data;
+    const contentType = response.headers.get('content-type');
+    if (contentType && contentType.includes('application/json')) {
+      data = await response.json();
+    } else {
+      const text = await response.text();
+      // Clean HTML tags if server returned HTML error page to show a shorter, cleaner error message
+      const cleanText = text.replace(/<[^>]*>/g, ' ').replace(/\s+/g, ' ').trim();
+      throw new Error(cleanText.substring(0, 100) || `Server returned error status ${response.status}`);
+    }
 
     if (!response.ok) {
       if (response.status === 401) {
@@ -187,6 +209,7 @@ goToLoginBtn.addEventListener('click', (e) => {
 
 loginForm.addEventListener('submit', async (e) => {
   e.preventDefault();
+  setButtonLoading(loginForm, true, 'Logging In...');
   try {
     const email = loginEmailInput.value;
     const password = loginPasswordInput.value;
@@ -204,11 +227,14 @@ loginForm.addEventListener('submit', async (e) => {
     loginPasswordInput.value = '';
   } catch (error) {
     showToast(error.message, 'error');
+  } finally {
+    setButtonLoading(loginForm, false);
   }
 });
 
 registerForm.addEventListener('submit', async (e) => {
   e.preventDefault();
+  setButtonLoading(registerForm, true, 'Signing Up...');
   try {
     const name = regNameInput.value;
     const email = regEmailInput.value;
@@ -230,6 +256,8 @@ registerForm.addEventListener('submit', async (e) => {
     regPasswordInput.value = '';
   } catch (error) {
     showToast(error.message, 'error');
+  } finally {
+    setButtonLoading(registerForm, false);
   }
 });
 
@@ -555,6 +583,7 @@ cancelTaskBtn.addEventListener('click', () => modalTask.classList.add('hidden'))
 // Forms submissions inside Modal
 projectCreateForm.addEventListener('submit', async (e) => {
   e.preventDefault();
+  setButtonLoading(projectCreateForm, true, 'Creating Project...');
   const name = document.getElementById('project-name').value;
   const description = document.getElementById('project-desc').value;
 
@@ -579,11 +608,14 @@ projectCreateForm.addEventListener('submit', async (e) => {
     selectProject(res.data.id);
   } catch (error) {
     showToast(error.message, 'error');
+  } finally {
+    setButtonLoading(projectCreateForm, false);
   }
 });
 
 taskCreateForm.addEventListener('submit', async (e) => {
   e.preventDefault();
+  setButtonLoading(taskCreateForm, true, 'Creating Task...');
   const title = document.getElementById('task-title').value;
   const description = document.getElementById('task-desc').value;
   const val = taskAssigneeSelect.value;
@@ -604,6 +636,8 @@ taskCreateForm.addEventListener('submit', async (e) => {
     loadProjectTasks(activeProjectId);
   } catch (error) {
     showToast(error.message, 'error');
+  } finally {
+    setButtonLoading(taskCreateForm, false);
   }
 });
 

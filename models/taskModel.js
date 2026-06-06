@@ -8,7 +8,7 @@ class TaskModel {
       RETURNING id
     `;
     const [result] = await pool.execute(query, [title, description, projectId, assignedTo]);
-    return result.insertId || (result[0] && result[0].id) || null;
+    return (result[0] && result[0].insertId) || result.insertId || (result[0] && result[0].id) || null;
   }
 
   static async findById(id) {

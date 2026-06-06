@@ -8,7 +8,7 @@ class UserModel {
       RETURNING id
     `;
     const [result] = await pool.execute(query, [name, email, passwordHash, role]);
-    return result.insertId || (result[0] && result[0].id) || null;
+    return (result[0] && result[0].insertId) || result.insertId || (result[0] && result[0].id) || null;
   }
 
   static async findByEmail(email) {

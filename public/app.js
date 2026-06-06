@@ -328,6 +328,14 @@ async function selectProject(projectId) {
   }
 }
 
+async function loadProjectTasks(projectId) {
+  try {
+    const res = await apiCall(`/tasks/project/${projectId}`);
+    renderTasksBoard(res.data);
+  } catch (error) {
+    showToast(error.message, 'error');
+  }
+}
 
 function renderTasksBoard(tasks) {
   // Clear lists

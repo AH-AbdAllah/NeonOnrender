@@ -8,7 +8,7 @@ class ProjectModel {
       RETURNING id
     `;
     const [result] = await pool.execute(query, [name, description, ownerId]);
-    return result.insertId || (result[0] && result[0].id) || null;
+    return (result[0] && result[0].insertId) || result.insertId || (result[0] && result[0].id) || null;
   }
 
   static async findAll() {

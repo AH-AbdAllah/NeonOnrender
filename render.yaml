@@ -1,0 +1,21 @@
+services:
+  - type: web
+    name: taskflow-backend
+    runtime: node
+    buildCommand: npm install
+    startCommand: npm start
+    envVars:
+      - key: NODE_ENV
+        value: production
+      - key: PORT
+        value: 10000
+      - key: DATABASE_URL
+        sync: false
+        placeholder: "PostgreSQL Connection String from Neon Console"
+      - key: JWT_SECRET
+        generateValue: true
+      - key: FIREBASE_SERVICE_ACCOUNT
+        sync: false
+        placeholder: "Optional: JSON service account key string for Firebase Logs"
+      - key: DB_MOCK
+        value: "false"

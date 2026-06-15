@@ -15,10 +15,8 @@ async function initializeDatabase() {
 
     console.log(`Found ${statements.length} SQL statements. Executing on target database...`);
 
-    const { getIsMock } = require('./config/db');
-
     for (let statement of statements) {
-      // Clean SQL comments so they don't break simple mock string matching
+      // Clean SQL comments so they don't break simple database parsing
       const cleanedStatement = statement
         .replace(/--.*$/gm, '') // Remove single-line comments
         .trim();
@@ -32,20 +30,7 @@ async function initializeDatabase() {
       }
 
       console.log(`[Executing] ${cleanedStatement.split('\n')[0]}...`);
-      if (getIsMock()) {
-        console.log(`[Mock Mode Active] Bypassing actual SQL execution for: ${cleanedStatement.split('\n')[0]}`);
-      } else {
-        try {
-          await pool.execute(cleanedStatement);
-        } catch (execErr) {
-          // If execution causes a connection failure and triggers fallback, we bypass the remaining statements
-          if (getIsMock()) {
-            console.log(`[Database Fallback Triggered] Bypassing execution for: ${cleanedStatement.split('\n')[0]}`);
-          } else {
-            throw execErr;
-          }
-        }
-      }
+      await pool.execute(cleanedStatement);
     }
 
     console.log('PostgreSQL Database schema created and seeded successfully.');

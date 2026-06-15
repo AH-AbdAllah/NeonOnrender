@@ -3,260 +3,292 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>TaskFlow - Smart Task Management Dashboard</title>
+  <title>TaskFlow - Project & Task Dashboard</title>
   
-  <!-- Modern Premium Typography -->
+  <!-- Premium Typography -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&family=Share+Tech+Mono&display=swap" rel="stylesheet">
   
   <!-- FontAwesome Icons -->
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
   
-  <!-- Styling -->
+  <!-- Custom CSS -->
   <link rel="stylesheet" href="style.css">
 </head>
-<body>
+<body class="theme-indigo">
 
-  <!-- Background decorative elements for premium gradient blur effect -->
+  <!-- Background Grids & Blurs -->
+  <div class="space-grid"></div>
   <div class="bg-blur blur-purple"></div>
   <div class="bg-blur blur-blue"></div>
 
-  <!-- Central Notification Toast -->
+  <!-- Toast Messages -->
   <div id="toast" class="toast hidden"></div>
 
   <!-- ========================================== -->
-  <!-- 1. AUTH GATEWAY VIEW                       -->
+  <!-- 1. ASYMMETRICAL SPLIT LOGIN GATEWAY        -->
   <!-- ========================================== -->
   <div id="auth-gateway" class="auth-gateway">
-    <div class="auth-card">
-      <div class="auth-header">
-        <div class="logo-circle">
-          <i class="fa-solid fa-layer-group"></i>
+    <div class="auth-split-left">
+      <div class="split-left-content">
+        <div class="terminal-banner">AETHER_CORE_DECRYPTION_v2.8</div>
+        <div class="terminal-logs" id="terminal-boot-logs">
+          <!-- Populated by JS -->
         </div>
-        <h1>TaskFlow</h1>
-        <p>Smart Task Management System</p>
       </div>
+    </div>
+    
+    <div class="auth-split-right">
+      <div class="split-right-content">
+        <span class="auth-badge">SECURE_NETWORK</span>
+        <h1>COORDINATE</h1>
+        <p>Coordinate your projects and tasks directly on Neon PostgreSQL relational nodes.</p>
+      </div>
+    </div>
 
-      <!-- Login Form -->
-      <form id="login-form" class="auth-form">
-        <h2>Welcome Back</h2>
-        <p class="subtitle">Log in to manage your sprints and tasks</p>
-        
-        <div class="input-group">
-          <label for="login-email"><i class="fa-solid fa-envelope"></i> Email</label>
-          <input type="email" id="login-email" required placeholder="name@taskflow.com">
-        </div>
-        
-        <div class="input-group">
-          <label for="login-password"><i class="fa-solid fa-lock"></i> Password</label>
-          <input type="password" id="login-password" required placeholder="••••••••">
-        </div>
+    <!-- Centered Form Card -->
+    <div class="auth-centered-card">
+      <div class="auth-card-sidebar">
+        <span>LOGIN_PORTAL</span>
+      </div>
+      <div class="auth-card-main">
+        <!-- Login Form -->
+        <form id="login-form" class="auth-form">
+          <div class="auth-form-header">
+            <h2>LOG_IN</h2>
+            <p>Enter your credentials to access your workspace</p>
+          </div>
+          
+          <div class="input-group">
+            <label for="login-email"><i class="fa-solid fa-envelope"></i> Email Address</label>
+            <input type="email" id="login-email" required placeholder="user@domain.com">
+          </div>
+          
+          <div class="input-group">
+            <label for="login-password"><i class="fa-solid fa-lock"></i> Password</label>
+            <input type="password" id="login-password" required placeholder="••••••••">
+          </div>
 
-        <button type="submit" class="btn btn-primary btn-block">
-          <span>Log In</span> <i class="fa-solid fa-arrow-right-to-bracket"></i>
-        </button>
+          <button type="submit" class="btn btn-primary btn-block">
+            <span>LOG IN</span> <i class="fa-solid fa-key"></i>
+          </button>
 
-        <p class="auth-toggle-text">
-          Don't have an account? <a href="#" id="go-to-register">Register here</a>
-        </p>
-      </form>
+          <p class="auth-toggle-text">
+            No account? <a href="#" id="go-to-register">Create Account</a>
+          </p>
+        </form>
 
-      <!-- Register Form -->
-      <form id="register-form" class="auth-form hidden">
-        <h2>Create Account</h2>
-        <p class="subtitle">Join TaskFlow and coordinate your projects</p>
-        
-        <div class="input-group">
-          <label for="reg-name"><i class="fa-solid fa-user"></i> Full Name</label>
-          <input type="text" id="reg-name" required placeholder="John Doe">
-        </div>
+        <!-- Register Form -->
+        <form id="register-form" class="auth-form hidden">
+          <div class="auth-form-header">
+            <h2>CREATE_ACCOUNT</h2>
+            <p>Enroll developer identity inside directory tables</p>
+          </div>
+          
+          <div class="input-group">
+            <label for="reg-name"><i class="fa-solid fa-user"></i> Full Name</label>
+            <input type="text" id="reg-name" required placeholder="John Doe">
+          </div>
 
-        <div class="input-group">
-          <label for="reg-email"><i class="fa-solid fa-envelope"></i> Email</label>
-          <input type="email" id="reg-email" required placeholder="name@taskflow.com">
-        </div>
-        
-        <div class="input-group">
-          <label for="reg-password"><i class="fa-solid fa-lock"></i> Password</label>
-          <input type="password" id="reg-password" required placeholder="Minimum 6 characters">
-        </div>
+          <div class="input-group">
+            <label for="reg-email"><i class="fa-solid fa-envelope"></i> Email Address</label>
+            <input type="email" id="reg-email" required placeholder="user@domain.com">
+          </div>
+          
+          <div class="input-group">
+            <label for="reg-password"><i class="fa-solid fa-lock"></i> Password</label>
+            <input type="password" id="reg-password" required placeholder="Min 6 characters">
+          </div>
 
-        <div class="input-group">
-          <label for="reg-role"><i class="fa-solid fa-user-shield"></i> Role Account Type</label>
-          <select id="reg-role">
-            <option value="User" selected>Regular Developer (User)</option>
-            <option value="Admin">Project Manager (Admin)</option>
-          </select>
-        </div>
+          <div class="input-group">
+            <label for="reg-role"><i class="fa-solid fa-user-shield"></i> System Role Boundary</label>
+            <select id="reg-role">
+              <option value="User" selected>Regular Developer (User)</option>
+              <option value="Admin">Project Manager (Admin)</option>
+            </select>
+          </div>
 
-        <button type="submit" class="btn btn-primary btn-block">
-          <span>Sign Up</span> <i class="fa-solid fa-user-plus"></i>
-        </button>
+          <button type="submit" class="btn btn-primary btn-block">
+            <span>REGISTER</span> <i class="fa-solid fa-user-plus"></i>
+          </button>
 
-        <p class="auth-toggle-text">
-          Already have an account? <a href="#" id="go-to-login">Log in here</a>
-        </p>
-      </form>
+          <p class="auth-toggle-text">
+            Already verified? <a href="#" id="go-to-login">Log In</a>
+          </p>
+        </form>
+      </div>
     </div>
   </div>
 
   <!-- ========================================== -->
-  <!-- 2. DASHBOARD VIEW                          -->
+  <!-- 2. AETHER HUD CORE WORKSPACE               -->
   <!-- ========================================== -->
   <div id="dashboard-layout" class="dashboard-layout hidden">
     
-    <!-- Sidebar Navigation -->
-    <aside class="sidebar">
-      <div class="sidebar-header">
-        <i class="fa-solid fa-layer-group logo-icon"></i>
+    <!-- Top Control Bar / Status Deck -->
+    <header class="control-deck">
+      <div class="system-brand">
+        <i class="fa-solid fa-microchip logo-icon"></i>
         <span class="logo-text">TaskFlow</span>
       </div>
 
-      <!-- Logged-in profile badge -->
+      <!-- Database Nodes Link Status -->
+      <div class="system-status-tray">
+        <div class="status-node neon" title="Neon serverless Postgres holds users, projects, and tasks relational data.">
+          <span class="node-dot neon-dot"></span>
+          <span class="node-text">Neon PG</span>
+        </div>
+        <div class="status-node firestore" title="Google Firebase Firestore records system events and audit logs.">
+          <span class="node-dot firestore-dot"></span>
+          <span class="node-text">Firebase Logs</span>
+        </div>
+      </div>
+
+      <!-- Theme Switcher Buttons -->
+      <div class="theme-switcher-container">
+        <div class="theme-buttons">
+          <button class="theme-btn active" data-theme="indigo" title="Copper Forge" style="background: linear-gradient(135deg, #d97706, #0ea5e9);"></button>
+          <button class="theme-btn" data-theme="emerald" title="Alpine Moss" style="background: linear-gradient(135deg, #10b981, #d4af37);"></button>
+          <button class="theme-btn" data-theme="crimson" title="Solar Flare" style="background: linear-gradient(135deg, #dc2626, #ea580c);"></button>
+          <button class="theme-btn" data-theme="cyberpunk" title="Deep Marine" style="background: linear-gradient(135deg, #00f5ff, #14b8a6);"></button>
+          <button class="theme-btn" data-theme="light" title="Sterile Lab" style="background: linear-gradient(135deg, #0f172a, #ffffff); border: 1px solid rgba(0, 0, 0, 0.15);"></button>
+        </div>
+      </div>
+
+      <!-- User profiles tray badge -->
       <div class="user-profile-badge">
-        <div class="profile-avatar" id="user-avatar">U</div>
+        <div class="profile-avatar" id="user-avatar">A</div>
         <div class="profile-info">
-          <h3 id="user-fullname">Loading...</h3>
+          <h3 id="user-fullname">Operator</h3>
           <span id="user-role-badge" class="role-badge">User</span>
         </div>
       </div>
 
-      <!-- Databases Status & Role Distinction badges -->
-      <div class="db-status-container">
-        <span class="db-status-title"><i class="fa-solid fa-server"></i> System Services</span>
-        <div class="db-status-item db-neon" title="Neon serverless Postgres holds users, projects, and tasks relational data.">
-          <span class="db-dot dot-neon"></span>
-          <div class="db-info">
-            <span class="db-title">Neon Console</span>
-            <span class="db-subtitle">PostgreSQL (Relational)</span>
-          </div>
-        </div>
-        <div class="db-status-item db-firestore" title="Google Firebase Firestore records system events and audit logs asynchronously.">
-          <span class="db-dot dot-firestore"></span>
-          <div class="db-info">
-            <span class="db-title">Firebase Logs</span>
-            <span class="db-subtitle">NoSQL (Audit Trail)</span>
-          </div>
-        </div>
-      </div>
+      <!-- Shut down power button -->
+      <button id="btn-logout" class="btn-logout" title="Log Out Session">
+        <i class="fa-solid fa-power-off"></i>
+      </button>
+    </header>
 
-      <!-- Navigation Projects lists -->
-      <div class="sidebar-section">
-        <div class="section-title-row">
-          <span><i class="fa-solid fa-folder-open"></i> Projects</span>
-          <button id="btn-open-project-modal" title="Create New Project" class="icon-add-btn">
-            <i class="fa-solid fa-plus"></i>
-          </button>
-        </div>
-        <ul id="projects-list-ul" class="projects-list">
-          <!-- Populate dynamically -->
-          <li class="loading-placeholder">Loading projects...</li>
-        </ul>
+    <!-- Sub-Deck Workspace Tabs (Projects) -->
+    <div class="hud-sub-deck">
+      <div class="sub-deck-projects-label">
+        <i class="fa-solid fa-cubes"></i> <span>PROJECTS:</span>
       </div>
+      
+      <!-- Horizontal tabs -->
+      <ul id="projects-list-ul" class="projects-tabs-list">
+        <li class="loading-placeholder">Loading projects...</li>
+      </ul>
 
-      <!-- Bottom controls -->
-      <div class="sidebar-footer">
-        <button id="btn-logout" class="btn-logout">
-          <i class="fa-solid fa-power-off"></i> <span>Log Out</span>
-        </button>
-      </div>
-    </aside>
+      <!-- Add volume project button -->
+      <button id="btn-open-project-modal" title="Add New Project" class="project-add-btn">
+        <i class="fa-solid fa-circle-plus"></i> <span>ADD PROJECT</span>
+      </button>
+    </div>
 
-    <!-- Main Workspace Content -->
+    <!-- Main Workspace Container -->
     <main class="main-workspace">
       
-      <!-- Top header bar -->
-      <header class="workspace-header">
+      <!-- Workspace Info Banner -->
+      <div class="workspace-project-info">
         <div class="project-title-area">
-          <h1 id="active-project-name">Select a Project</h1>
-          <p id="active-project-desc">Choose a project from the sidebar to begin managing tasks.</p>
+          <div class="active-project-row">
+            <span class="active-badge">ACTIVE_PROJECT</span>
+            <h1 id="active-project-name">Select a Project</h1>
+          </div>
+          <p id="active-project-desc">Select a project tab above to view its tasks dashboard.</p>
         </div>
         <div class="workspace-actions">
           <button id="btn-open-task-modal" class="btn btn-primary hidden">
-            <i class="fa-solid fa-circle-plus"></i> Add Task
+            <i class="fa-solid fa-circle-plus"></i> <span>ADD TASK</span>
           </button>
         </div>
-      </header>
+      </div>
 
-      <!-- Reports / Aggregates metrics widget -->
+      <!-- Diagnostics Telemetry (Stats Dashboard) -->
       <section id="reports-section" class="reports-section hidden">
-        <div class="report-card card-total">
+        <div class="report-card total">
           <div class="card-icon"><i class="fa-solid fa-list-check"></i></div>
           <div class="card-content">
-            <span class="card-label">Total Sprints Tasks</span>
+            <span class="card-label">TOTAL TASKS</span>
             <h2 id="stat-total">0</h2>
           </div>
         </div>
         
-        <div class="report-card card-pending">
+        <div class="report-card pending">
           <div class="card-icon"><i class="fa-solid fa-clock"></i></div>
           <div class="card-content">
-            <span class="card-label">Pending Review</span>
+            <span class="card-label">PENDING</span>
             <h2 id="stat-pending">0</h2>
           </div>
         </div>
 
-        <div class="report-card card-inprogress">
+        <div class="report-card inprogress">
           <div class="card-icon"><i class="fa-solid fa-spinner fa-spin-slow"></i></div>
           <div class="card-content">
-            <span class="card-label">In Progress</span>
+            <span class="card-label">IN PROGRESS</span>
             <h2 id="stat-inprogress">0</h2>
           </div>
         </div>
 
-        <div class="report-card card-completed">
+        <div class="report-card completed">
           <div class="card-icon"><i class="fa-solid fa-circle-check"></i></div>
           <div class="card-content">
-            <span class="card-label">Completed Task</span>
+            <span class="card-label">COMPLETED</span>
             <h2 id="stat-completed">0</h2>
           </div>
         </div>
       </section>
 
-      <!-- Board Workspace -->
+      <!-- Board Workspace Placeholder -->
       <div id="board-workspace-placeholder" class="board-workspace-placeholder">
         <div class="placeholder-content">
-          <i class="fa-solid fa-diagram-project placeholder-icon"></i>
+          <i class="fa-solid fa-network-wired placeholder-icon"></i>
           <h2>Welcome to TaskFlow</h2>
-          <p>Get started by selecting an existing project or creating a new workspace using the plus (+) icon next to Projects.</p>
+          <p>Select a project from the tabs above to view and manage tasks.</p>
         </div>
       </div>
 
+      <!-- Mobile/Narrow columns switcher segmented menu -->
+      <div id="kanban-switcher" class="kanban-switcher hidden">
+        <button class="switcher-btn active" data-col="pending">PENDING</button>
+        <button class="switcher-btn" data-col="inprogress">IN PROGRESS</button>
+        <button class="switcher-btn" data-col="completed">COMPLETED</button>
+      </div>
+
+      <!-- Kanban Columns Panel -->
       <section id="board-workspace" class="board-workspace hidden">
         
-        <!-- Kanban Columns -->
+        <!-- Column 1: Pending -->
         <div class="kanban-column" id="col-pending">
           <div class="column-header">
             <span class="dot dot-pending"></span>
-            <h3>Pending</h3>
+            <h3>PENDING</h3>
             <span class="column-count" id="count-pending">0</span>
           </div>
-          <div class="task-cards-container" id="tasks-pending-container">
-            <!-- populated dynamically -->
-          </div>
+          <div class="task-cards-container" id="tasks-pending-container"></div>
         </div>
 
+        <!-- Column 2: InProgress -->
         <div class="kanban-column" id="col-inprogress">
           <div class="column-header">
             <span class="dot dot-inprogress"></span>
-            <h3>In Progress</h3>
+            <h3>IN PROGRESS</h3>
             <span class="column-count" id="count-inprogress">0</span>
           </div>
-          <div class="task-cards-container" id="tasks-inprogress-container">
-            <!-- populated dynamically -->
-          </div>
+          <div class="task-cards-container" id="tasks-inprogress-container"></div>
         </div>
 
+        <!-- Column 3: Done -->
         <div class="kanban-column" id="col-done">
           <div class="column-header">
             <span class="dot dot-done"></span>
-            <h3>Done</h3>
+            <h3>COMPLETED</h3>
             <span class="column-count" id="count-done">0</span>
           </div>
-          <div class="task-cards-container" id="tasks-done-container">
-            <!-- populated dynamically -->
-          </div>
+          <div class="task-cards-container" id="tasks-done-container"></div>
         </div>
 
       </section>
@@ -265,44 +297,42 @@
   </div>
 
   <!-- ========================================== -->
-  <!-- 3. MODALS AND POPUPS                       -->
+  <!-- 3. MODALS POPUPS KEY INSERTS               -->
   <!-- ========================================== -->
 
-  <!-- Create Project Modal -->
+  <!-- Modal Project Creator -->
   <div id="modal-project" class="modal-overlay hidden">
     <div class="modal-card">
       <div class="modal-header">
-        <h2>Create New Project</h2>
+        <h2>Add New Project</h2>
         <button class="modal-close-btn" id="btn-close-project-modal">&times;</button>
       </div>
       <form id="project-create-form">
         <div class="input-group">
           <label for="project-name">Project Name</label>
-          <input type="text" id="project-name" required placeholder="e.g. Sprints Deployment Q2">
+          <input type="text" id="project-name" required placeholder="e.g. Mobile App Redesign">
         </div>
         <div class="input-group">
-          <label for="project-desc">Description</label>
-          <textarea id="project-desc" placeholder="Describe the workspace goals..."></textarea>
+          <label for="project-desc">Project Description</label>
+          <textarea id="project-desc" placeholder="Describe the project objectives..."></textarea>
         </div>
         <div id="project-owner-group" class="input-group hidden">
-          <label for="project-owner">Project Owner</label>
-          <select id="project-owner">
-            <!-- populated dynamically with list of users -->
-          </select>
+          <label for="project-owner">Project Manager</label>
+          <select id="project-owner"></select>
         </div>
         <div class="modal-actions">
           <button type="button" class="btn btn-secondary" id="btn-cancel-project">Cancel</button>
-          <button type="submit" class="btn btn-primary">Create Workspace</button>
+          <button type="submit" class="btn btn-primary">Add Project</button>
         </div>
       </form>
     </div>
   </div>
 
-  <!-- Create Task Modal -->
+  <!-- Modal Task Creator -->
   <div id="modal-task" class="modal-overlay hidden">
     <div class="modal-card">
       <div class="modal-header">
-        <h2>Create New Task</h2>
+        <h2>Add New Task</h2>
         <button class="modal-close-btn" id="btn-close-task-modal">&times;</button>
       </div>
       <form id="task-create-form">
@@ -311,27 +341,26 @@
           <input type="text" id="task-title" required placeholder="e.g. Refactor API endpoints">
         </div>
         <div class="input-group">
-          <label for="task-desc">Description</label>
-          <textarea id="task-desc" placeholder="Provide details on the task..."></textarea>
+          <label for="task-desc">Task Description</label>
+          <textarea id="task-desc" placeholder="Details or task scope..."></textarea>
         </div>
         
         <div class="input-group">
-          <label for="task-assignee">Assignee</label>
+          <label for="task-assignee">Assign User</label>
           <select id="task-assignee">
             <option value="">Unassigned (None)</option>
-            <!-- populate dynamically with list of users -->
           </select>
         </div>
 
         <div class="modal-actions">
           <button type="button" class="btn btn-secondary" id="btn-cancel-task">Cancel</button>
-          <button type="submit" class="btn btn-primary">Create Task</button>
+          <button type="submit" class="btn btn-primary">Add Task</button>
         </div>
       </form>
     </div>
   </div>
 
-  <!-- Client Code Script -->
+  <!-- Client Script -->
   <script src="app.js"></script>
 </body>
 </html>

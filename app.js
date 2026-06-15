@@ -4,7 +4,6 @@ const { setupSwagger } = require('./swagger/swagger');
 const authRoutes = require('./routes/authRoutes');
 const projectRoutes = require('./routes/projectRoutes');
 const taskRoutes = require('./routes/taskRoutes');
-const reportRoutes = require('./routes/reportRoutes');
 const { errorHandler, notFoundHandler } = require('./middleware/errorMiddleware');
 
 const app = express();
@@ -27,7 +26,6 @@ setupSwagger(app);
 app.use('/api/auth', authRoutes);
 app.use('/api/projects', projectRoutes);
 app.use('/api/tasks', taskRoutes);
-app.use('/api/reports', reportRoutes);
 
 // 5. Fallbacks and Global Error Handlers
 app.use(notFoundHandler);

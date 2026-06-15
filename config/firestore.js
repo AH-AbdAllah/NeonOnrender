@@ -2,8 +2,7 @@ const admin = require('firebase-admin');
 const fs = require('fs');
 require('dotenv').config();
 
-let db;
-let isMock = false;
+let db = null;
 
 try {
   const saRaw = (process.env.FIREBASE_SERVICE_ACCOUNT || '').trim();
@@ -26,35 +25,16 @@ try {
     db = admin.firestore();
     console.log('Successfully initialized Firestore client using file path.');
   } else {
-    // If no configuration is provided, fall back to mock
-    throw new Error('No Firestore service account credentials provided.');
+    console.warn('[Firestore Log Info] No Firestore service account credentials provided. Database event logging is disabled.');
   }
 } catch (error) {
   console.warn('--- FIRESTORE INACTIVE ---');
   console.warn(`Reason: ${error.message}`);
-  console.warn('Logging will fall back to local console mock mode.');
+  console.warn('Logging will be bypassed gracefully.');
   console.warn('-------------------------');
-
-  isMock = true;
-  db = {
-    collection: (collectionName) => ({
-      add: async (documentData) => {
-        const docId = `mock-doc-${Math.random().toString(36).substring(2, 11)}`;
-        console.log(`[Mock Firestore Log][${collectionName}][ID: ${docId}]:`, JSON.stringify(documentData, null, 2));
-        return {
-          id: docId,
-          get: async () => ({
-            id: docId,
-            exists: true,
-            data: () => documentData
-          })
-        };
-      }
-    })
-  };
+  db = null;
 }
 
 module.exports = {
-  db,
-  isMock
+  db
 };

@@ -1,4 +1,4 @@
-// TaskFlow Client Side Dashboard logic
+// TaskFlow Client Side Dashboard Controller
 
 const API_BASE = '/api';
 
@@ -95,7 +95,7 @@ function setButtonLoading(form, isLoading, text) {
   if (isLoading) {
     btn.dataset.originalHtml = btn.innerHTML;
     btn.disabled = true;
-    btn.innerHTML = `<i class="fa-solid fa-spinner fa-spin"></i> <span>${text}</span>`;
+    btn.innerHTML = `<i class="fa-solid fa-circle-notch fa-spin"></i> <span>${text}</span>`;
   } else {
     btn.disabled = false;
     btn.innerHTML = btn.dataset.originalHtml || btn.innerHTML;
@@ -124,16 +124,14 @@ async function apiCall(endpoint, options = {}) {
       data = await response.json();
     } else {
       const text = await response.text();
-      // Clean HTML tags if server returned HTML error page to show a shorter, cleaner error message
       const cleanText = text.replace(/<[^>]*>/g, ' ').replace(/\s+/g, ' ').trim();
       throw new Error(cleanText.substring(0, 100) || `Server returned error status ${response.status}`);
     }
 
     if (!response.ok) {
       if (response.status === 401) {
-        // Handle expired token or session issues
         if (token) {
-          showToast(data.message || 'Session expired. Please log in again.', 'error');
+          showToast(data.message || 'Session expired. Please decrypt credentials again.', 'error');
           logout();
         }
       }
@@ -191,7 +189,37 @@ function initView() {
   } else {
     dashboardLayout.classList.add('hidden');
     authGateway.classList.remove('hidden');
+    document.getElementById('kanban-switcher')?.classList.add('hidden');
+    simulateBootLogs();
   }
+}
+
+// Boot Logger Simulation
+const bootMessages = [
+  "> INITIALIZING SECURE DATABASE CONNECTORS...",
+  "> LOADING DRIVERS... OK",
+  "> MAIN DATABASE: POSTGRESQL (NEON CLOUD)",
+  "> CONNECTION VERIFIED [OK]",
+  "> FIREBASE EVENT LOGGER INITIALIZED [STANDBY]",
+  "> PENDING USER LOGIN...",
+];
+function simulateBootLogs() {
+  const container = document.getElementById('terminal-boot-logs');
+  if (!container) return;
+  container.innerHTML = '';
+  
+  let i = 0;
+  function addNext() {
+    if (i < bootMessages.length) {
+      const p = document.createElement('p');
+      p.innerText = bootMessages[i];
+      container.appendChild(p);
+      container.scrollTop = container.scrollHeight;
+      i++;
+      setTimeout(addNext, 400);
+    }
+  }
+  addNext();
 }
 
 // Auth Actions
@@ -209,7 +237,7 @@ goToLoginBtn.addEventListener('click', (e) => {
 
 loginForm.addEventListener('submit', async (e) => {
   e.preventDefault();
-  setButtonLoading(loginForm, true, 'Logging In...');
+  setButtonLoading(loginForm, true, 'Logging in...');
   try {
     const email = loginEmailInput.value;
     const password = loginPasswordInput.value;
@@ -219,10 +247,9 @@ loginForm.addEventListener('submit', async (e) => {
       body: { email, password }
     });
 
-    showToast('Welcome to TaskFlow Dashboard!');
+    showToast('Logged in successfully.');
     saveSession(res.data.token, res.data.user);
     
-    // Clear inputs
     loginEmailInput.value = '';
     loginPasswordInput.value = '';
   } catch (error) {
@@ -234,7 +261,7 @@ loginForm.addEventListener('submit', async (e) => {
 
 registerForm.addEventListener('submit', async (e) => {
   e.preventDefault();
-  setButtonLoading(registerForm, true, 'Signing Up...');
+  setButtonLoading(registerForm, true, 'Registering Account...');
   try {
     const name = regNameInput.value;
     const email = regEmailInput.value;
@@ -246,11 +273,10 @@ registerForm.addEventListener('submit', async (e) => {
       body: { name, email, password, role }
     });
 
-    showToast('Registration successful! Please log in.');
+    showToast('Account registered successfully.');
     registerForm.classList.add('hidden');
     loginForm.classList.remove('hidden');
 
-    // Clear inputs
     regNameInput.value = '';
     regEmailInput.value = '';
     regPasswordInput.value = '';
@@ -279,19 +305,18 @@ async function loadUsers() {
     const res = await apiCall('/auth/users');
     usersList = res.data;
     
-    // Populate Assignee Select in modal
     taskAssigneeSelect.innerHTML = '<option value="">Unassigned (None)</option>';
     usersList.forEach(u => {
-      taskAssigneeSelect.innerHTML += `<option value="${u.id}">${u.name} (${u.role})</option>`;
+      taskAssigneeSelect.innerHTML += `<option value="${u.id}">${escapeHTML(u.name)} (${escapeHTML(u.role)})</option>`;
     });
   } catch (error) {
-    console.warn('Failed to load user directories directory:', error.message);
+    console.warn('Failed to load active operators directory:', error.message);
   }
 }
 
 function renderProjectsList() {
   if (projects.length === 0) {
-    projectsListUl.innerHTML = '<li class="loading-placeholder">No projects available</li>';
+    projectsListUl.innerHTML = '<li class="loading-placeholder">No projects found</li>';
     return;
   }
 
@@ -299,7 +324,7 @@ function renderProjectsList() {
   projects.forEach(p => {
     const li = document.createElement('li');
     li.dataset.id = p.id;
-    li.innerHTML = `<i class="fa-solid fa-square-kanban"></i> ${p.name}`;
+    li.innerHTML = `<i class="fa-solid fa-cube"></i> ${escapeHTML(p.name)}`;
     if (activeProjectId === p.id) {
       li.classList.add('active');
     }
@@ -311,7 +336,6 @@ function renderProjectsList() {
 
 async function selectProject(projectId) {
   try {
-    // Speed optimization: Fetch project details and tasks concurrently in parallel (saves 1 RTT)
     const [projectRes, tasksRes] = await Promise.all([
       apiCall(`/projects/${projectId}`),
       apiCall(`/tasks/project/${projectId}`)
@@ -322,7 +346,6 @@ async function selectProject(projectId) {
 
     activeProjectId = projectId;
 
-    // Highlight active
     const items = projectsListUl.querySelectorAll('li');
     items.forEach(li => {
       if (parseInt(li.dataset.id, 10) === projectId) {
@@ -335,12 +358,10 @@ async function selectProject(projectId) {
     activeProjectName.innerText = activeProject.name;
     activeProjectDesc.innerText = activeProject.description || 'No description provided.';
 
-    // Show Workspace
     boardPlaceholder.classList.add('hidden');
     boardWorkspace.classList.remove('hidden');
     reportsSection.classList.remove('hidden');
     
-    // Check create tasks permission boundary: Standard users can only create tasks in projects they own
     const isOwner = activeProject.owner_id === currentUser.id;
     const isAdmin = currentUser.role === 'Admin';
     if (isAdmin || isOwner) {
@@ -349,8 +370,16 @@ async function selectProject(projectId) {
       addTaskHeaderBtn.classList.add('hidden');
     }
 
-    // Render Tasks Board
     renderTasksBoard(tasks);
+
+    // Show Mobile Switcher
+    const switcher = document.getElementById('kanban-switcher');
+    if (switcher) {
+      switcher.classList.remove('hidden');
+    }
+    
+    // Set Default active column for Mobile viewports
+    resetMobileColumn();
   } catch (error) {
     showToast(error.message, 'error');
   }
@@ -366,7 +395,6 @@ async function loadProjectTasks(projectId) {
 }
 
 function renderTasksBoard(tasks) {
-  // Clear lists
   tasksPendingContainer.innerHTML = '';
   tasksInprogressContainer.innerHTML = '';
   tasksDoneContainer.innerHTML = '';
@@ -392,7 +420,6 @@ function renderTasksBoard(tasks) {
   countInprogress.innerText = countI;
   countDone.innerText = countD;
 
-  // Dynamically update statistics panels based on current project tasks
   statTotal.innerText = tasks.length;
   statPending.innerText = countP;
   statInprogress.innerText = countI;
@@ -406,9 +433,9 @@ function createTaskCard(task) {
 
   const assigneeInit = task.assignee_name ? task.assignee_name.charAt(0).toUpperCase() : '?';
   const assigneeName = task.assignee_name || 'Unassigned';
+  const escapedAssigneeName = escapeHTML(assigneeName);
+  const escapedAssigneeInit = escapeHTML(assigneeInit);
 
-  // Check actions permission boundaries
-  // Admins can update/assign everything. Project owners can assign and status. Assignee can only update status.
   const isProjectOwner = projects.find(p => p.id === task.project_id)?.owner_id === currentUser.id;
   const isAssignee = task.assigned_to === currentUser.id;
   const isAdmin = currentUser.role === 'Admin';
@@ -418,33 +445,30 @@ function createTaskCard(task) {
 
   let actionButtonsHtml = '';
 
-  // Assign user select dropdown (only if authorized)
   let assignmentHtml = '';
   if (canAssign) {
     assignmentHtml = `
       <button class="btn-action-icon btn-assign" title="Assign User" onclick="promptTaskAssignment(${task.id}, ${task.assigned_to})">
-        <i class="fa-solid fa-user-pen"></i>
+        <i class="fa-solid fa-user-gear"></i>
       </button>
     `;
   }
 
-  // Task deletion (only if authorized)
   const canDelete = isAdmin || isProjectOwner;
   let deleteHtml = '';
   if (canDelete) {
     deleteHtml = `
       <button class="btn-action-icon btn-delete" title="Delete Task" onclick="deleteTask(${task.id})">
-        <i class="fa-solid fa-trash"></i>
+        <i class="fa-solid fa-trash-can"></i>
       </button>
     `;
   }
 
-  // Next status progression helper button
   if (canUpdateStatus) {
     if (task.status === 'Pending') {
       actionButtonsHtml += `
         <button class="btn-action-icon btn-next" title="Move to In Progress" onclick="progressTaskStatus(${task.id}, 'InProgress')">
-          <i class="fa-solid fa-arrow-right"></i>
+          <i class="fa-solid fa-chevron-right"></i>
         </button>
       `;
     } else if (task.status === 'InProgress') {
@@ -457,12 +481,16 @@ function createTaskCard(task) {
   }
 
   card.innerHTML = `
+    <div style="display:flex; justify-content:space-between; align-items:center; font-family:'Share Tech Mono', monospace; font-size:0.72rem; color:var(--text-dark); border-bottom: 1px solid rgba(255,255,255,0.03); padding-bottom:6px; margin-bottom:4px;">
+      <span>#TASK-${task.id}</span>
+      <span class="active-project-tag" style="padding:1px 4px; font-size:0.6rem; border-radius:2px; margin:0;">${escapeHTML(task.status)}</span>
+    </div>
     <div class="task-card-title">${escapeHTML(task.title)}</div>
     ${task.description ? `<div class="task-card-desc">${escapeHTML(task.description)}</div>` : ''}
     <div class="task-card-footer">
-      <div class="task-assignee-info" title="Assignee: ${assigneeName}">
-        <div class="task-assignee-avatar">${assigneeInit}</div>
-        <span>${assigneeName}</span>
+      <div class="task-assignee-info" title="Assignee: ${escapedAssigneeName}">
+        <div class="task-assignee-avatar">${escapedAssigneeInit}</div>
+        <span>${escapedAssigneeName}</span>
       </div>
       <div class="task-actions-row">
         ${assignmentHtml}
@@ -475,7 +503,7 @@ function createTaskCard(task) {
   return card;
 }
 
-// Global scope click progress functions
+// Global scope updates
 window.progressTaskStatus = async function(taskId, nextStatus) {
   try {
     await apiCall(`/tasks/${taskId}/status`, {
@@ -491,25 +519,25 @@ window.progressTaskStatus = async function(taskId, nextStatus) {
 };
 
 window.promptTaskAssignment = async function(taskId, currentAssigneeId) {
-  // Generate assignment overlay modal list
-  const activeTask = document.querySelector(`.task-card[data-id="${taskId}"]`);
   const modalHTML = `
     <div id="modal-assignee-temp" class="modal-overlay">
       <div class="modal-card">
         <div class="modal-header">
-          <h2>Assign Developer</h2>
+          <h2>Assign Task</h2>
           <button class="modal-close-btn" onclick="document.getElementById('modal-assignee-temp').remove()">&times;</button>
         </div>
-        <div class="input-group">
-          <label for="temp-assignee-select">Choose Team Member</label>
-          <select id="temp-assignee-select">
-            <option value="">Unassign User</option>
-            ${usersList.map(u => `<option value="${u.id}" ${u.id === currentAssigneeId ? 'selected' : ''}>${u.name} (${u.role})</option>`).join('')}
-          </select>
-        </div>
-        <div class="modal-actions">
-          <button type="button" class="btn btn-secondary" onclick="document.getElementById('modal-assignee-temp').remove()">Cancel</button>
-          <button type="button" class="btn btn-primary" onclick="confirmTaskAssignment(${taskId})">Assign</button>
+        <div class="window-body">
+          <div class="input-group">
+            <label for="temp-assignee-select">Select User</label>
+            <select id="temp-assignee-select">
+              <option value="">Unassign User</option>
+              ${usersList.map(u => `<option value="${u.id}" ${u.id === currentAssigneeId ? 'selected' : ''}>${escapeHTML(u.name)} (${escapeHTML(u.role)})</option>`).join('')}
+            </select>
+          </div>
+          <div class="modal-actions">
+            <button type="button" class="btn btn-secondary" onclick="document.getElementById('modal-assignee-temp').remove()">Cancel</button>
+            <button type="button" class="btn btn-primary" onclick="confirmTaskAssignment(${taskId})">Assign</button>
+          </div>
         </div>
       </div>
     </div>
@@ -527,7 +555,7 @@ window.confirmTaskAssignment = async function(taskId) {
       body: { assignedTo }
     });
 
-    showToast('Task assignee updated successfully.');
+    showToast('Task assignee updated.');
     document.getElementById('modal-assignee-temp').remove();
     loadProjectTasks(activeProjectId);
   } catch (error) {
@@ -562,7 +590,7 @@ function escapeHTML(str) {
   );
 }
 
-// Modal Toggle Handlers
+// Modal Trigger Hooks
 openProjectModalBtn.addEventListener('click', () => {
   modalProject.classList.remove('hidden');
   if (currentUser && currentUser.role === 'Admin') {
@@ -576,14 +604,16 @@ openProjectModalBtn.addEventListener('click', () => {
 closeProjectModalBtn.addEventListener('click', () => modalProject.classList.add('hidden'));
 cancelProjectBtn.addEventListener('click', () => modalProject.classList.add('hidden'));
 
-addTaskHeaderBtn.addEventListener('click', () => modalTask.classList.remove('hidden'));
+addTaskHeaderBtn.addEventListener('click', () => {
+  modalTask.classList.remove('hidden');
+});
 closeTaskModalBtn.addEventListener('click', () => modalTask.classList.add('hidden'));
 cancelTaskBtn.addEventListener('click', () => modalTask.classList.add('hidden'));
 
-// Forms submissions inside Modal
+// Form Submissions
 projectCreateForm.addEventListener('submit', async (e) => {
   e.preventDefault();
-  setButtonLoading(projectCreateForm, true, 'Creating Project...');
+  setButtonLoading(projectCreateForm, true, 'Adding Project...');
   const name = document.getElementById('project-name').value;
   const description = document.getElementById('project-desc').value;
 
@@ -598,7 +628,7 @@ projectCreateForm.addEventListener('submit', async (e) => {
       body
     });
 
-    showToast('Workspace created successfully.');
+    showToast('Project created successfully.');
     modalProject.classList.add('hidden');
     document.getElementById('project-name').value = '';
     document.getElementById('project-desc').value = '';
@@ -615,7 +645,7 @@ projectCreateForm.addEventListener('submit', async (e) => {
 
 taskCreateForm.addEventListener('submit', async (e) => {
   e.preventDefault();
-  setButtonLoading(taskCreateForm, true, 'Creating Task...');
+  setButtonLoading(taskCreateForm, true, 'Adding Task...');
   const title = document.getElementById('task-title').value;
   const description = document.getElementById('task-desc').value;
   const val = taskAssigneeSelect.value;
@@ -627,7 +657,7 @@ taskCreateForm.addEventListener('submit', async (e) => {
       body: { title, description, projectId: activeProjectId, assignedTo }
     });
 
-    showToast('Task added successfully.');
+    showToast('Task created successfully.');
     modalTask.classList.add('hidden');
     document.getElementById('task-title').value = '';
     document.getElementById('task-desc').value = '';
@@ -641,5 +671,77 @@ taskCreateForm.addEventListener('submit', async (e) => {
   }
 });
 
-// App Startup
+// ========================================================== */
+// Mobile Segmented Switcher & Column Toggling
+// ========================================================== */
+function initKanbanSwitcher() {
+  const switcher = document.getElementById('kanban-switcher');
+  const buttons = document.querySelectorAll('.switcher-btn');
+  
+  buttons.forEach(btn => {
+    btn.addEventListener('click', () => {
+      buttons.forEach(b => b.classList.remove('active'));
+      btn.classList.add('active');
+
+      const colTag = btn.dataset.col;
+      toggleMobileColumn(colTag);
+    });
+  });
+}
+
+function resetMobileColumn() {
+  document.querySelectorAll('.switcher-btn').forEach(btn => {
+    btn.classList.toggle('active', btn.dataset.col === 'pending');
+  });
+  toggleMobileColumn('pending');
+}
+
+function toggleMobileColumn(colTag) {
+  const cols = {
+    pending: document.getElementById('col-pending'),
+    inprogress: document.getElementById('col-inprogress'),
+    completed: document.getElementById('col-done')
+  };
+
+  Object.keys(cols).forEach(k => {
+    if (cols[k]) {
+      if (k === colTag) {
+        cols[k].classList.add('active');
+      } else {
+        cols[k].classList.remove('active');
+      }
+    }
+  });
+}
+
+// ========================================================== */
+// Theme Switches & Persistence                                
+// ========================================================== */
+function initTheme() {
+  const savedTheme = localStorage.getItem('taskflow_theme') || 'indigo';
+  setTheme(savedTheme);
+
+  document.querySelectorAll('.theme-buttons .theme-btn').forEach(btn => {
+    btn.addEventListener('click', () => {
+      const theme = btn.dataset.theme;
+      setTheme(theme);
+    });
+  });
+}
+
+function setTheme(themeName) {
+  const themeClasses = Array.from(document.body.classList).filter(c => c.startsWith('theme-'));
+  themeClasses.forEach(c => document.body.classList.remove(c));
+
+  document.body.classList.add(`theme-${themeName}`);
+  localStorage.setItem('taskflow_theme', themeName);
+
+  document.querySelectorAll('.theme-buttons .theme-btn').forEach(btn => {
+    btn.classList.toggle('active', btn.dataset.theme === themeName);
+  });
+}
+
+// Initialize Application view
+initTheme();
 initView();
+initKanbanSwitcher();

@@ -16,10 +16,6 @@ class LogService {
         console.error(`[Firestore Log Service Error] Action: ${action}, Message: ${error.message}`);
       });
   }
-
-  static async fetchLogs(limit) {
-    return await LogModel.getLogs(limit);
-  }
 }
 
 module.exports = LogService;

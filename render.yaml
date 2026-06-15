@@ -17,5 +17,3 @@ services:
       - key: FIREBASE_SERVICE_ACCOUNT
         sync: false
         placeholder: "Optional: JSON service account key string for Firebase Logs"
-      - key: DB_MOCK
-        value: "false"
